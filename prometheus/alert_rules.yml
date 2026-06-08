@@ -1,0 +1,11 @@
+groups:
+  - name: application-alerts
+    rules:
+      - alert: CRITICAL_ApplicationErrorRateHigh
+        expr: sum(increase(app_errors_total[1m])) > 5
+        for: 0s
+        labels:
+          severity: critical
+        annotations:
+          summary: "CRITICAL: application error rate is above 5 errors per minute"
+          description: "The application emitted more than 5 errors during the last minute."
