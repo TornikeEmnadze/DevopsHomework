@@ -1,6 +1,6 @@
 # DevOps Observability Lab
 
-This repository contains a complete Docker Compose observability stack for a small instrumented Flask application.
+This project implements a Docker Compose observability stack for a small instrumented Flask application.
 
 ## Architecture Diagram
 
@@ -74,7 +74,7 @@ It also exposes a latency histogram:
 
 - `app_request_duration_seconds`
 
-Every non-metrics request emits JSON logs to stdout and to `/var/log/app/app.log`. The file is stored in a Docker volume shared with Promtail. Promtail parses JSON fields, promotes useful fields to Loki labels, and ships the logs to Loki.
+Every non-metrics request emits JSON logs to stdout and to `/var/log/app/app.log`. The log file is stored in a Docker volume shared with Promtail. Promtail parses fields such as `level`, `method`, `path`, and `status`, converts them into Loki labels, and ships the logs to Loki.
 
 Example log shape:
 
@@ -156,28 +156,4 @@ Loki stores log streams. It indexes labels and keeps the full log content as ent
 
 ### How would you handle long-term log retention for 6 months without depleting disk resources?
 
-For long-term retention, I would avoid keeping all logs on local Docker volumes. I would configure Loki retention policies, reduce noisy/debug logs, and ship older chunks to cheaper object storage such as S3, Azure Blob Storage, or Google Cloud Storage. I would also separate retention by value: critical application errors and audit logs can be kept longer, while high-volume info/debug logs can be sampled, compressed, or deleted sooner.
-
-## Useful Commands
-
-Stop the stack:
-
-```powershell
-docker compose down
-```
-
-Stop the stack and delete stored volumes:
-
-```powershell
-docker compose down -v
-```
-
-View app logs:
-
-```powershell
-docker compose logs app
-```
-
-Validate Prometheus targets:
-
-- http://localhost:9090/targets
+For long-term retention, logs should not remain only on local Docker volumes. A production setup should configure Loki retention policies, reduce noisy debug logs, and ship older chunks to cheaper object storage such as S3, Azure Blob Storage, or Google Cloud Storage. Retention can also be separated by value: critical application errors and audit logs can be kept longer, while high-volume info/debug logs can be sampled, compressed, or deleted sooner.
